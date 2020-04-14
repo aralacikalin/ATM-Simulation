@@ -47,7 +47,7 @@ def simulation(lambd,mean,capacity):
                 events.append([time+randDeparture,"Departure",customerNo])
                 #! eğer is serving değilse aynı customer için bi tane daha list entery oluşturuyo
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
-                customers.append([customerNo,events[0][0],time+randDeparture,randDeparture,0]) #que time=departure time-service time-arrival time
+                customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time)]) #que time=departure time-service time-arrival time
 
                 randArrival=randomExp(lambd)
                 events.append([time+randArrival,"Arrival",customerNo+1])
@@ -78,7 +78,7 @@ def simulation(lambd,mean,capacity):
                 customers[customerNo+1][2]=time+randDeparture
                 customers[customerNo+1][3]=randDeparture
                 #que time = departure time- service time-arrival time
-                customers[customerNo+1][4]=time+randDeparture-randDeparture-customers[customerNo+1][1]
+                customers[customerNo+1][4]=time+randDeparture-(randDeparture+customers[customerNo+1][1])
 
                 #TODO collect statistics
                 events.pop(0)
