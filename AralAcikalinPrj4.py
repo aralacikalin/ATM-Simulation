@@ -35,6 +35,7 @@ def simulation(lambd,mean,capacity):
         #set the clock to the events clock
         time=events[0][0]
 
+#TODO: capacity UNUTMA!!!
         #Arrival event
         if(events[0][1]=="Arrival"):
             if(not isServing):
@@ -45,7 +46,10 @@ def simulation(lambd,mean,capacity):
 
                 randDeparture=randomExp(mean)
                 events.append([time+randDeparture,"Departure",customerNo])
-                #! eğer is serving değilse aynı customer için bi tane daha list entery oluşturuyo
+                #! eğer is serving değilse aynı customer için bi tane daha list entery oluşturuyo 
+                #TODO ! çözülmüş olabilir ama daha çok kontrol et
+                if(len(customers)-1==customerNo):
+                    customers.pop(customerNo)
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
                 customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time)]) #que time=departure time-service time-arrival time
 
