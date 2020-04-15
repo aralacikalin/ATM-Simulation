@@ -3,6 +3,7 @@
 
 import random
 from timeit import default_timer as timer
+import pandas
 
 def randomExp(lambd):
     '''Creating a random inter-arival time in seconds'''  
@@ -29,15 +30,15 @@ def simulation(lambd,mean,capacity):
 
 
     randArrival=randomExp(lambd)
-    time+=randArrival
     customerNo=0
 
     #stores events as time, event flag and customer no
     events=[[time,"Arrival",customerNo]]
     while(len(customers)<1000000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
-
+        
         #set the clock to the events clock
         time=events[0][0]
+        
 
 #TODO: capacity UNUTMA!!!
         #Arrival event
@@ -105,6 +106,15 @@ def simulation(lambd,mean,capacity):
 
         #sorting the events acording to their time
         events.sort()
+
+        #saving current snapshot
+        if(len(snapshot)<6):
+            tempEvents=events.copy()
+            snapshot.append([time,customersinQue,isServing,tempEvents])#!cumulatif istatistikler hakkında mail at
+
+
+    collumns=["Clock","Customers in Que","isServing","Future Event List"]
+    #table=pandas.DataFrame(snapshot,collumns)
     totalServiceTime=0
     customerCount=0
     for c in customers: #TODO cs sayısına göre düzenlenebilir
@@ -118,6 +128,9 @@ def simulation(lambd,mean,capacity):
     avarageSystemTime=totalSystemTime/customerCount
     avarageQue=queTime/customerCount
     avarageServiceTime=totalServiceTime/servedCustomerCount
+
+    #print(table)
+    
 
     print("q: " ,avarageQue , "s: ", avarageServiceTime, "cs :", customerCount, "c:",servedCustomerCount)
 
