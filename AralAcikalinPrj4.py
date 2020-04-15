@@ -14,7 +14,9 @@ def randomExp(lambd):
 def simulation(lambd,mean,capacity):
     #initialize the simulation, statistics.
     snapshot=[]
-    waitTime=0
+    queTime=0
+    servedCustomerCount=0 #!gerekebilir silinedebilir
+    serviceTime=0
 
 
     #initializing the system state
@@ -32,8 +34,7 @@ def simulation(lambd,mean,capacity):
 
     #stores events as time, event flag and customer no
     events=[[time,"Arrival",customerNo]]
-
-    while(len(customers)<10000000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
+    while(len(customers)<1000000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
 
         #set the clock to the events clock
         time=events[0][0]
@@ -76,6 +77,7 @@ def simulation(lambd,mean,capacity):
 
         #Departure event
         elif(events[0][1]=="Departure"):
+            servedCustomerCount+=1 #!gerekebilir silinedebilir
             if(customersinQue>0):
                 customerNo=events[0][2]
                 customersinQue-=1
@@ -90,7 +92,7 @@ def simulation(lambd,mean,capacity):
                 #TODO collect statistics
                 events.pop(0)
             else:
-
+                #!test et burdayken customers arrayinde noluyo diye
                 """
                 customerNo=events[0][2]
                 customers[customerNo][2]=time
@@ -103,15 +105,21 @@ def simulation(lambd,mean,capacity):
 
         #sorting the events acording to their time
         events.sort()
-    sumq=0
-    sums=0
-    cs=0
-    for c in customers:
+    totalServiceTime=0
+    customerCount=0
+    for c in customers: #TODO cs sayısına göre düzenlenebilir
         if (not c[4] == None) and (not c[3] == None):
-            sumq+=c[4]
-            sums+=c[3]
-            cs+=1
-    print("q: " ,sumq/cs , "s: ", sums/cs)
+            queTime+=c[4]
+            totalServiceTime+=c[3]
+            customerCount+=1
+    
+    totalSystemTime=totalServiceTime+customerCount
+
+    avarageSystemTime=totalSystemTime/customerCount
+    avarageQue=queTime/customerCount
+    avarageServiceTime=totalServiceTime/servedCustomerCount
+
+    print("q: " ,avarageQue , "s: ", avarageServiceTime, "cs :", customerCount, "c:",servedCustomerCount)
 
 
 
