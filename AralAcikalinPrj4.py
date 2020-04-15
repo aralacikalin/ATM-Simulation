@@ -1,5 +1,8 @@
-#Aral Açıkalın
+#Aral Açıkalın 20161701036
+#written using python version 3.8.0 64-bit
+
 import random
+from timeit import default_timer as timer
 
 def randomExp(lambd):
     '''Creating a random inter-arival time in seconds'''  
@@ -30,7 +33,7 @@ def simulation(lambd,mean,capacity):
     #stores events as time, event flag and customer no
     events=[[time,"Arrival",customerNo]]
 
-    for i in range(1000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
+    while(len(customers)<10000000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
 
         #set the clock to the events clock
         time=events[0][0]
@@ -100,5 +103,19 @@ def simulation(lambd,mean,capacity):
 
         #sorting the events acording to their time
         events.sort()
+    sumq=0
+    sums=0
+    cs=0
+    for c in customers:
+        if (not c[4] == None) and (not c[3] == None):
+            sumq+=c[4]
+            sums+=c[3]
+            cs+=1
+    print("q: " ,sumq/cs , "s: ", sums/cs)
 
+
+
+start=timer() #for outputing the run time of the code
 simulation(10,12,5)
+
+print("Time Elapsed: ",timer()-start," seconds.")
