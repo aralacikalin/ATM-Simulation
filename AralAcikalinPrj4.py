@@ -45,9 +45,10 @@ def simulation(lambd,mean,capacity):
         #set the clock to the events clock
         time=events[0][0]
 
-#TODO: capacity UNUTMA!!!
+        #TODO: capacity UNUTMA!!!
         #Arrival event
         if(events[0][1]=="Arrival"):
+            
             #if no one is in service creates one depature event for the current 
             #and one arrival event for the next customer
             if(not isServing):
@@ -76,18 +77,48 @@ def simulation(lambd,mean,capacity):
                 customersinSystem=customersinQue+1
 
             else:
-                customerNo=events[0][2]
-                customersinQue+=1
-                customersinSystem=customersinQue+1
+                if(capacity!=0):
+                    if(capacity>=customersinQue+1):
+                        customerNo=events[0][2]
+                        customersinQue+=1
+                        customersinSystem=customersinQue+1
 
-                #creating a arrival event
-                randArrival=randomExp(lambd)
-                events.append([time+randArrival,"Arrival",customerNo+1])
+                        #creating a arrival event
+                        randArrival=randomExp(lambd)
+                        events.append([time+randArrival,"Arrival",customerNo+1])
 
-                customers.append([customerNo+1,time+randArrival,None,None,None])
+                        customers.append([customerNo+1,time+randArrival,None,None,None])
 
-                #pop the event that currently handled
-                events.pop(0)
+                        #pop the event that currently handled
+                        events.pop(0)
+                    else:
+                        customerNo=events[0][2]
+                        customersinSystem=customersinQue+1
+                        customerLeft+=1
+
+                        #creating a arrival event
+                        randArrival=randomExp(lambd)
+                        events.append([time+randArrival,"Arrival",customerNo+1])
+
+                        customers.append([customerNo+1,time+randArrival,None,None,None])
+
+                        #pop the event that currently handled
+                        events.pop(0)
+                else:
+                    customerNo=events[0][2]
+                    customersinQue+=1
+                    customersinSystem=customersinQue+1
+
+                    #creating a arrival event
+                    randArrival=randomExp(lambd)
+                    events.append([time+randArrival,"Arrival",customerNo+1])
+
+                    customers.append([customerNo+1,time+randArrival,None,None,None])
+
+                    #pop the event that currently handled
+                    events.pop(0)
+
+
 
         #Departure event
         elif(events[0][1]=="Departure"):
@@ -180,6 +211,6 @@ def simulation(lambd,mean,capacity):
 
 
 start=timer() #for outputing the run time of the code
-simulation(10,12,5)
+simulation(10,12,0)
 
 print("\nTime Elapsed: ",timer()-start," seconds.")
