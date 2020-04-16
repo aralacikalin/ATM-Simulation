@@ -45,7 +45,6 @@ def simulation(lambd,mean,capacity):
         #set the clock to the events clock
         time=events[0][0]
 
-        #TODO: capacity UNUTMA!!!
         #Arrival event
         if(events[0][1]=="Arrival"):
             
@@ -77,7 +76,9 @@ def simulation(lambd,mean,capacity):
                 customersinSystem=customersinQue+1
 
             else:
+                #if capacity argument is 0 then there is no capacity in the simulation
                 if(capacity!=0):
+                    #checks if arrival is over capacity
                     if(capacity>customersinQue+1):
                         customerNo=events[0][2]
                         customersinQue+=1
@@ -195,7 +196,7 @@ def simulation(lambd,mean,capacity):
     avarageSystemTime=totalSystemTime/customerCount
     avarageQue=queTime/customerCount
     avarageServiceTime=totalServiceTime/servedCustomerCount
-    percentageCustomersLeft=(customerLeft/servedCustomerCount)*100
+    percentageCustomersLeft=(customerLeft/(servedCustomerCount+customerLeft))*100
 
     #table headers clock is current time, q is customers in queue,inSys is customers in system 
     #and right side of the future event list is the cumulative statistics
@@ -212,7 +213,16 @@ def simulation(lambd,mean,capacity):
 
 
 
-start=timer() #for outputing the run time of the code
-simulation(10,12,0)
+def main():
 
-print("\nTime Elapsed: ",timer()-start," seconds.")
+    l=int(input("Enter λ: "))
+    m=int(input("Enter µ: "))
+    n=int(input("Enter Capacity(Enter 0 for infinite capacity): "))
+
+    start=timer() #for outputing the run time of the code
+    simulation(l,m,n)
+
+    print("\nTime Elapsed: ",timer()-start," seconds.")
+
+
+main()
