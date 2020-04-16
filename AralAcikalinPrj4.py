@@ -19,6 +19,8 @@ def simulation(lambd,mean,capacity):
     queTime=0
     servedCustomerCount=0 #!gerekebilir silinedebilir
     serviceTime=0
+    customersinSystem=0
+    allSnapshots=[]
 
 
     #initializing the system state
@@ -39,7 +41,6 @@ def simulation(lambd,mean,capacity):
         
         #set the clock to the events clock
         time=events[0][0]
-        
 
 #TODO: capacity UNUTMA!!!
         #Arrival event
@@ -52,8 +53,8 @@ def simulation(lambd,mean,capacity):
 
                 randDeparture=randomExp(mean)
                 events.append([time+randDeparture,"Departure",customerNo])
-                #! eğer is serving değilse aynı customer için bi tane daha list entery oluşturuyo 
-                #TODO ! çözülmüş olabilir ama daha çok kontrol et
+
+
                 if(len(customers)-1==customerNo):
                     customers.pop(customerNo)
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
@@ -65,10 +66,13 @@ def simulation(lambd,mean,capacity):
                 customers.append([customerNo+1,time+randArrival,None,None,None])
                 #TODO collect statistics
                 events.pop(0)
+                customersinSystem=customersinQue+1
 
             else:
                 customerNo=events[0][2]
                 customersinQue+=1
+                customersinSystem=customersinQue+1
+
                 randArrival=randomExp(lambd)
                 events.append([time+randArrival,"Arrival",customerNo+1])
 
@@ -79,10 +83,17 @@ def simulation(lambd,mean,capacity):
 
         #Departure event
         elif(events[0][1]=="Departure"):
-            servedCustomerCount+=1 #!gerekebilir silinedebilir
+
+            if(customers!=[]):
+                if(customers[events[0][2]][3]!=None):
+                    serviceTime+=customers[events[0][2]][3]
+
+            servedCustomerCount+=1
             if(customersinQue>0):
                 customerNo=events[0][2]
                 customersinQue-=1
+                customersinSystem=customersinQue+1
+
                 randDeparture=randomExp(mean)
                 events.append([time+randDeparture,"Departure",customerNo+1])
 
@@ -94,13 +105,8 @@ def simulation(lambd,mean,capacity):
                 #TODO collect statistics
                 events.pop(0)
             else:
-                #!test et burdayken customers arrayinde noluyo diye
-                """
-                customerNo=events[0][2]
-                customers[customerNo][2]=time
-                """
 
-
+                customersinSystem=0
                 #setting ls(t) to 0
                 isServing=False
                 events.pop(0)
@@ -109,11 +115,13 @@ def simulation(lambd,mean,capacity):
         events.sort()
 
         #saving current snapshot
+        tempEvent=events.copy()
+        allSnapshots.append([time,customersinQue,isServing,tempEvent,customersinSystem])
         if(len(snapshot)<6):
             tempEvents=events.copy()
-            snapshot.append([time,customersinQue,isServing,tempEvents])#!cumulatif istatistikler hakkında mail at
+            snapshot.append([time,customersinQue,isServing,tempEvents,customersinSystem,serviceTime])
 
-
+    
     totalServiceTime=0
     customerCount=0
     for i in range(servedCustomerCount): #TODO cs sayısına göre düzenlenebilir
@@ -128,15 +136,14 @@ def simulation(lambd,mean,capacity):
     avarageQue=queTime/customerCount
     avarageServiceTime=totalServiceTime/servedCustomerCount
 
-    table=pandas.DataFrame(customers) #TODO silmeyi unutma
-    print(table.tail(15))
-    print(tabulate.tabulate(snapshot,headers=["Clock","Customers in Que","isServing","Future Event List"]),"\n")
-    
+    headers=["Clock","in Que","isServing","Future Event List","in System","service Time"]
+    print(tabulate.tabulate(snapshot,headers=headers),"\n")
 
     print("Avarage Queue Time: " ,avarageQue)
     print("Avarage System Time: ", avarageSystemTime, "cs :", customerCount, "c:",servedCustomerCount)
 
-    #TODO avarage number of customers in the que
+    #TODO avarage number of customers in que and system
+    #TODO percentage of customers who cannot enter the atm
 
 
 
