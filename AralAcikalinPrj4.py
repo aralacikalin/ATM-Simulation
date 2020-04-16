@@ -78,7 +78,7 @@ def simulation(lambd,mean,capacity):
 
             else:
                 if(capacity!=0):
-                    if(capacity>=customersinQue+1):
+                    if(capacity>customersinQue+1):
                         customerNo=events[0][2]
                         customersinQue+=1
                         customersinSystem=customersinQue+1
@@ -96,9 +96,11 @@ def simulation(lambd,mean,capacity):
                         customersinSystem=customersinQue+1
                         customerLeft+=1
 
+                        customers.pop(customerNo)
+
                         #creating a arrival event
                         randArrival=randomExp(lambd)
-                        events.append([time+randArrival,"Arrival",customerNo+1])
+                        events.append([time+randArrival,"Arrival",customerNo])
 
                         customers.append([customerNo+1,time+randArrival,None,None,None])
 
@@ -113,7 +115,7 @@ def simulation(lambd,mean,capacity):
                     randArrival=randomExp(lambd)
                     events.append([time+randArrival,"Arrival",customerNo+1])
 
-                    customers.append([customerNo+1,time+randArrival,None,None,None])
+                    customers.append([customerNo,time+randArrival,None,None,None])
 
                     #pop the event that currently handled
                     events.pop(0)
@@ -195,9 +197,9 @@ def simulation(lambd,mean,capacity):
     avarageServiceTime=totalServiceTime/servedCustomerCount
     percentageCustomersLeft=(customerLeft/servedCustomerCount)*100
 
-    #table headers clock is current time, que is customers in que,inSys is customers in system 
+    #table headers clock is current time, q is customers in queue,inSys is customers in system 
     #and right side of the future event list is the cumulative statistics
-    headers=["Clock","Que","isSrv","inSys","Future Event List","srvTime","cQue","cSys"]
+    headers=["Clock","Q","isSrv","Sys","Future Event List","srvTime","cQ","cSys"]
     print(tabulate.tabulate(snapshot,headers=headers),"\n")
 
     print("Customers Served Number: ",servedCustomerCount)
