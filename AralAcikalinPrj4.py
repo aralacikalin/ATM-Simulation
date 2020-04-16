@@ -3,7 +3,6 @@
 
 import random
 from timeit import default_timer as timer
-import pandas
 import tabulate
 
 def randomExp(lambd):
@@ -20,6 +19,7 @@ def simulation(lambd,mean,capacity):
     servedCustomerCount=0
     customersinSystem=0
     allSnapshots=[]
+    customerLeft=0
 
     serviceTime=0
     cumulCustomersinQue=0
@@ -40,7 +40,7 @@ def simulation(lambd,mean,capacity):
 
     #stores events as time, event flag and customer no
     events=[[time+randArrival,"Arrival",customerNo]]
-    while(servedCustomerCount<10000000):
+    while(servedCustomerCount<1000000):
         
         #set the clock to the events clock
         time=events[0][0]
@@ -70,7 +70,6 @@ def simulation(lambd,mean,capacity):
                 events.append([time+randArrival,"Arrival",customerNo+1])
 
                 customers.append([customerNo+1,time+randArrival,None,None,None])
-                #TODO collect statistics
 
                 #pop the event that currently handled
                 events.pop(0)
@@ -89,7 +88,6 @@ def simulation(lambd,mean,capacity):
 
                 #pop the event that currently handled
                 events.pop(0)
-                #TODO collect statistics
 
         #Departure event
         elif(events[0][1]=="Departure"):
@@ -156,26 +154,28 @@ def simulation(lambd,mean,capacity):
     
     totalSystemTime=totalServiceTime+queTime
 
+    #avarage of customers in queue and in system
     avarageNumberCustomersinQue=allSnapshots[len(allSnapshots)-1][6]/len(allSnapshots)
     avarageNumberCustomersinSys=allSnapshots[len(allSnapshots)-1][7]/len(allSnapshots)
 
 
     avarageSystemTime=totalSystemTime/customerCount
     avarageQue=queTime/customerCount
-    avarageServiceTime=totalServiceTime/servedCustomerCount #!silinebilir gösteriledebilir
+    avarageServiceTime=totalServiceTime/servedCustomerCount
+    percentageCustomersLeft=(customerLeft/servedCustomerCount)*100
 
     #table headers clock is current time, que is customers in que,inSys is customers in system 
     #and right side of the future event list is the cumulative statistics
     headers=["Clock","Que","isSrv","inSys","Future Event List","srvTime","cQue","cSys"]
     print(tabulate.tabulate(snapshot,headers=headers),"\n")
 
+    print("Customers Served Number: ",servedCustomerCount)
     print("Avarage Queue Time: " ,avarageQue)
-    print("Avarage System Time: ", avarageSystemTime, "cs :", customerCount, "c:",servedCustomerCount)
+    print("Avarage Service Time: ", avarageServiceTime)
+    print("Avarage System Time: ", avarageSystemTime)
     print("Avarage Number of Customers in Queue: ", avarageNumberCustomersinQue)
     print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys)
-
-    #TODO avarage number of customers in que and system
-    #TODO percentage of customers who cannot enter the atm
+    print("Percentage of customers who cannot enter the ATM: %", percentageCustomersLeft)
 
 
 
