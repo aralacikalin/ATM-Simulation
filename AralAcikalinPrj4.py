@@ -4,6 +4,7 @@
 import random
 from timeit import default_timer as timer
 import pandas
+import tabulate
 
 def randomExp(lambd):
     '''Creating a random inter-arival time in seconds'''  
@@ -33,8 +34,8 @@ def simulation(lambd,mean,capacity):
     customerNo=0
 
     #stores events as time, event flag and customer no
-    events=[[time,"Arrival",customerNo]]
-    while(len(customers)<1000000): #TODO müşteri sayısı kadar loop yapmak için while ile değiştir
+    events=[[time+randArrival,"Arrival",customerNo]]
+    while(servedCustomerCount<1000000): #minus 1 because we have a 0th customer
         
         #set the clock to the events clock
         time=events[0][0]
@@ -113,30 +114,33 @@ def simulation(lambd,mean,capacity):
             snapshot.append([time,customersinQue,isServing,tempEvents])#!cumulatif istatistikler hakkında mail at
 
 
-    collumns=["Clock","Customers in Que","isServing","Future Event List"]
-    #table=pandas.DataFrame(snapshot,collumns)
     totalServiceTime=0
     customerCount=0
-    for c in customers: #TODO cs sayısına göre düzenlenebilir
-        if (not c[4] == None) and (not c[3] == None):
-            queTime+=c[4]
-            totalServiceTime+=c[3]
+    for i in range(servedCustomerCount): #TODO cs sayısına göre düzenlenebilir
+        if (not customers[i][4] == None) and (not customers[i][3] == None):
+            queTime+=customers[i][4]
+            totalServiceTime+=customers[i][3]
             customerCount+=1
     
-    totalSystemTime=totalServiceTime+customerCount
+    totalSystemTime=totalServiceTime+queTime
 
     avarageSystemTime=totalSystemTime/customerCount
     avarageQue=queTime/customerCount
     avarageServiceTime=totalServiceTime/servedCustomerCount
 
-    #print(table)
+    table=pandas.DataFrame(customers) #TODO silmeyi unutma
+    print(table.tail(15))
+    print(tabulate.tabulate(snapshot,headers=["Clock","Customers in Que","isServing","Future Event List"]),"\n")
     
 
-    print("q: " ,avarageQue , "s: ", avarageServiceTime, "cs :", customerCount, "c:",servedCustomerCount)
+    print("Avarage Queue Time: " ,avarageQue)
+    print("Avarage System Time: ", avarageSystemTime, "cs :", customerCount, "c:",servedCustomerCount)
+
+    #TODO avarage number of customers in the que
 
 
 
 start=timer() #for outputing the run time of the code
 simulation(10,12,5)
 
-print("Time Elapsed: ",timer()-start," seconds.")
+print("\nTime Elapsed: ",timer()-start," seconds.")
