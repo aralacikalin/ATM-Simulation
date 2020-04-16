@@ -14,13 +14,16 @@ def randomExp(lambd):
     return nextArrival
 
 def simulation(lambd,mean,capacity):
-    #initialize the simulation, statistics.
+    #initialize the simulation, statistics, cumulative statistics.
     snapshot=[]
     queTime=0
-    servedCustomerCount=0 #!gerekebilir silinedebilir
-    serviceTime=0
+    servedCustomerCount=0
     customersinSystem=0
     allSnapshots=[]
+
+    serviceTime=0
+    cumulCustomersinQue=0
+    cumulCustomersinSystem=0
 
 
     #initializing the system state
@@ -31,13 +34,13 @@ def simulation(lambd,mean,capacity):
     #customer entity list
     customers=[]
 
-
+    #as first event creating a arrival event
     randArrival=randomExp(lambd)
     customerNo=0
 
     #stores events as time, event flag and customer no
     events=[[time+randArrival,"Arrival",customerNo]]
-    while(servedCustomerCount<1000000): #minus 1 because we have a 0th customer
+    while(servedCustomerCount<10000000):
         
         #set the clock to the events clock
         time=events[0][0]
@@ -45,12 +48,14 @@ def simulation(lambd,mean,capacity):
 #TODO: capacity UNUTMA!!!
         #Arrival event
         if(events[0][1]=="Arrival"):
+            #if no one is in service creates one depature event for the current 
+            #and one arrival event for the next customer
             if(not isServing):
                 #setting ls(t) to 1
                 isServing=True
                 customerNo=events[0][2]
 
-
+                #creating a departure event
                 randDeparture=randomExp(mean)
                 events.append([time+randDeparture,"Departure",customerNo])
 
@@ -60,11 +65,14 @@ def simulation(lambd,mean,capacity):
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
                 customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time)]) #que time=departure time-service time-arrival time
 
+                #creating a arrival event
                 randArrival=randomExp(lambd)
                 events.append([time+randArrival,"Arrival",customerNo+1])
 
                 customers.append([customerNo+1,time+randArrival,None,None,None])
                 #TODO collect statistics
+
+                #pop the event that currently handled
                 events.pop(0)
                 customersinSystem=customersinQue+1
 
@@ -73,36 +81,43 @@ def simulation(lambd,mean,capacity):
                 customersinQue+=1
                 customersinSystem=customersinQue+1
 
+                #creating a arrival event
                 randArrival=randomExp(lambd)
                 events.append([time+randArrival,"Arrival",customerNo+1])
 
                 customers.append([customerNo+1,time+randArrival,None,None,None])
 
+                #pop the event that currently handled
                 events.pop(0)
                 #TODO collect statistics
 
         #Departure event
         elif(events[0][1]=="Departure"):
 
+            #collecting cumulative service time
             if(customers!=[]):
                 if(customers[events[0][2]][3]!=None):
                     serviceTime+=customers[events[0][2]][3]
 
             servedCustomerCount+=1
+            #if queue is not empty create departure event for the next customer
             if(customersinQue>0):
                 customerNo=events[0][2]
                 customersinQue-=1
                 customersinSystem=customersinQue+1
 
+                #creating a departure event
                 randDeparture=randomExp(mean)
                 events.append([time+randDeparture,"Departure",customerNo+1])
 
+                #setting departure time of the customer
                 customers[customerNo+1][2]=time+randDeparture
+                #setting service time of the customer
                 customers[customerNo+1][3]=randDeparture
                 #que time = departure time- service time-arrival time
                 customers[customerNo+1][4]=time+randDeparture-(randDeparture+customers[customerNo+1][1])
-
-                #TODO collect statistics
+                
+                #pop the event that currently handled
                 events.pop(0)
             else:
 
@@ -114,17 +129,26 @@ def simulation(lambd,mean,capacity):
         #sorting the events acording to their time
         events.sort()
 
+        #collecting cumulative statistics
+        cumulCustomersinSystem+=customersinSystem
+        cumulCustomersinQue+=customersinQue
+
         #saving current snapshot
         tempEvent=events.copy()
-        allSnapshots.append([time,customersinQue,isServing,tempEvent,customersinSystem])
+        allSnapshots.append([time,customersinQue,isServing,customersinSystem,tempEvent,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
+
+        #for printing the first 6 snapshots
         if(len(snapshot)<6):
             tempEvents=events.copy()
-            snapshot.append([time,customersinQue,isServing,tempEvents,customersinSystem,serviceTime])
+            snapshot.append([time,customersinQue,isServing,customersinSystem,tempEvents,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
+
 
     
+
+
     totalServiceTime=0
     customerCount=0
-    for i in range(servedCustomerCount): #TODO cs sayısına göre düzenlenebilir
+    for i in range(servedCustomerCount):
         if (not customers[i][4] == None) and (not customers[i][3] == None):
             queTime+=customers[i][4]
             totalServiceTime+=customers[i][3]
@@ -132,15 +156,23 @@ def simulation(lambd,mean,capacity):
     
     totalSystemTime=totalServiceTime+queTime
 
+    avarageNumberCustomersinQue=allSnapshots[len(allSnapshots)-1][6]/len(allSnapshots)
+    avarageNumberCustomersinSys=allSnapshots[len(allSnapshots)-1][7]/len(allSnapshots)
+
+
     avarageSystemTime=totalSystemTime/customerCount
     avarageQue=queTime/customerCount
-    avarageServiceTime=totalServiceTime/servedCustomerCount
+    avarageServiceTime=totalServiceTime/servedCustomerCount #!silinebilir gösteriledebilir
 
-    headers=["Clock","in Que","isServing","Future Event List","in System","service Time"]
+    #table headers clock is current time, que is customers in que,inSys is customers in system 
+    #and right side of the future event list is the cumulative statistics
+    headers=["Clock","Que","isSrv","inSys","Future Event List","srvTime","cQue","cSys"]
     print(tabulate.tabulate(snapshot,headers=headers),"\n")
 
     print("Avarage Queue Time: " ,avarageQue)
     print("Avarage System Time: ", avarageSystemTime, "cs :", customerCount, "c:",servedCustomerCount)
+    print("Avarage Number of Customers in Queue: ", avarageNumberCustomersinQue)
+    print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys)
 
     #TODO avarage number of customers in que and system
     #TODO percentage of customers who cannot enter the atm
