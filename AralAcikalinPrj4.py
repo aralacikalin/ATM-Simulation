@@ -3,6 +3,7 @@
 
 import random
 from timeit import default_timer as timer
+#pip install tabulate
 import tabulate
 
 def randomExp(lambd):
@@ -79,7 +80,7 @@ def simulation(lambd,mean,capacity):
                 #if capacity argument is 0 then there is no capacity in the simulation
                 if(capacity!=0):
                     #checks if arrival is over capacity
-                    if(capacity>customersinQue+1):
+                    if(capacity>customersinQue+1): #+1 is because we have to add the customer in the service then compare with the capacity
                         customerNo=events[0][2]
                         customersinQue+=1
                         customersinSystem=customersinQue+1
