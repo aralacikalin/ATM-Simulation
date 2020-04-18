@@ -19,8 +19,9 @@ def simulation(lambd,mean,capacity):
     queTime=0
     servedCustomerCount=0
     customersinSystem=0
-    allSnapshots=[]
+    allSnapshots=[] #!SİL
     customerLeft=0
+    snapshotCount=0
 
     serviceTime=0
     cumulCustomersinQue=0
@@ -166,12 +167,15 @@ def simulation(lambd,mean,capacity):
         cumulCustomersinSystem+=customersinSystem
         cumulCustomersinQue+=customersinQue
 
-        #saving current snapshot
-        tempEvent=events.copy()
-        allSnapshots.append([time,customersinQue,isServing,customersinSystem,tempEvent,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
+        #counting the snapshot count
+        snapshotCount+=1
+        #!SİL
+        #tempEvent=events.copy()
+        #allSnapshots.append([time,customersinQue,isServing,customersinSystem,tempEvent,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
 
+        howManySnapshots=6
         #for printing the first 6 snapshots
-        if(len(snapshot)<6):
+        if(len(snapshot)<howManySnapshots):
             tempEvents=events.copy()
             snapshot.append([time,customersinQue,isServing,customersinSystem,tempEvents,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
 
@@ -190,8 +194,8 @@ def simulation(lambd,mean,capacity):
     totalSystemTime=totalServiceTime+queTime
 
     #avarage of customers in queue and in system
-    avarageNumberCustomersinQue=allSnapshots[len(allSnapshots)-1][6]/len(allSnapshots)
-    avarageNumberCustomersinSys=allSnapshots[len(allSnapshots)-1][7]/len(allSnapshots)
+    avarageNumberCustomersinQue=cumulCustomersinQue/snapshotCount
+    avarageNumberCustomersinSys=cumulCustomersinSystem/snapshotCount
 
 
     avarageSystemTime=totalSystemTime/customerCount
