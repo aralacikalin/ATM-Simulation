@@ -19,7 +19,6 @@ def simulation(lambd,mean,capacity):
     queTime=0
     servedCustomerCount=0
     customersinSystem=0
-    allSnapshots=[] #!SİL
     customerLeft=0
     snapshotCount=0
 
@@ -63,7 +62,8 @@ def simulation(lambd,mean,capacity):
 
 
                 if(len(customers)-1==customerNo):
-                    customers.pop(customerNo)
+                    customers.pop(customerNo) #delete from customers list if the current customer entry is already created
+                
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
                 customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time)]) #que time=departure time-service time-arrival time
 
@@ -169,9 +169,6 @@ def simulation(lambd,mean,capacity):
 
         #counting the snapshot count
         snapshotCount+=1
-        #!SİL
-        #tempEvent=events.copy()
-        #allSnapshots.append([time,customersinQue,isServing,customersinSystem,tempEvent,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
 
         howManySnapshots=6
         #for printing the first 6 snapshots
