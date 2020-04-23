@@ -65,13 +65,13 @@ def simulation(lambd,mean,capacity):
                     customers.pop(customerNo) #delete from customers list if the current customer entry is already created
                 
                 #customer entity stored as customer no , arrival time, departure time, service time and que time
-                customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time)]) #que time=departure time-service time-arrival time
+                customers.append([customerNo,time,time+randDeparture,randDeparture,time+randDeparture-(randDeparture+time),customersinQue,customersinSystem]) #que time=departure time-service time-arrival time
 
                 #creating a arrival event
                 randArrival=randomExp(lambd)
                 events.append([time+randArrival,"Arrival",customerNo+1])
 
-                customers.append([customerNo+1,time+randArrival,None,None,None])
+                customers.append([customerNo+1,time+randArrival,None,None,None,None,None])
 
                 #pop the event that currently handled
                 events.pop(0)
@@ -90,7 +90,7 @@ def simulation(lambd,mean,capacity):
                         randArrival=randomExp(lambd)
                         events.append([time+randArrival,"Arrival",customerNo+1])
 
-                        customers.append([customerNo+1,time+randArrival,None,None,None])
+                        customers.append([customerNo+1,time+randArrival,None,None,None,None,None])
 
                         #pop the event that currently handled
                         events.pop(0)
@@ -105,7 +105,7 @@ def simulation(lambd,mean,capacity):
                         randArrival=randomExp(lambd)
                         events.append([time+randArrival,"Arrival",customerNo])
 
-                        customers.append([customerNo+1,time+randArrival,None,None,None])
+                        customers.append([customerNo+1,time+randArrival,None,None,None,None,None])
 
                         #pop the event that currently handled
                         events.pop(0)
@@ -118,7 +118,7 @@ def simulation(lambd,mean,capacity):
                     randArrival=randomExp(lambd)
                     events.append([time+randArrival,"Arrival",customerNo+1])
 
-                    customers.append([customerNo,time+randArrival,None,None,None])
+                    customers.append([customerNo,time+randArrival,None,None,None,None,None])
 
                     #pop the event that currently handled
                     events.pop(0)
@@ -150,6 +150,8 @@ def simulation(lambd,mean,capacity):
                 customers[customerNo+1][3]=randDeparture
                 #que time = departure time- service time-arrival time
                 customers[customerNo+1][4]=time+randDeparture-(randDeparture+customers[customerNo+1][1])
+                customers[customerNo+1][5]=customersinQue
+                customers[customerNo+1][6]=customersinSystem
                 
                 #pop the event that currently handled
                 events.pop(0)
@@ -170,7 +172,7 @@ def simulation(lambd,mean,capacity):
         #counting the snapshot count
         snapshotCount+=1
 
-        howManySnapshots=6
+        howManySnapshots=100
         #for printing the first 6 snapshots
         if(len(snapshot)<howManySnapshots):
             tempEvents=events.copy()
@@ -182,11 +184,16 @@ def simulation(lambd,mean,capacity):
 
     totalServiceTime=0
     customerCount=0
+    quecount=0
+    syscount=0
     for i in range(servedCustomerCount):
         if (not customers[i][4] == None) and (not customers[i][3] == None):
             queTime+=customers[i][4]
             totalServiceTime+=customers[i][3]
             customerCount+=1
+            if(not customers[i][5] == None) and (not customers[i][6] == None):
+                quecount+=customers[i][5]
+                syscount+=customers[i][6]
     
     totalSystemTime=totalServiceTime+queTime
 
@@ -209,8 +216,8 @@ def simulation(lambd,mean,capacity):
     print("Avarage Queue Time: " ,avarageQue)
     print("Avarage Service Time: ", avarageServiceTime)
     print("Avarage System Time: ", avarageSystemTime)
-    print("Avarage Number of Customers in Queue: ", avarageNumberCustomersinQue)
-    print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys)
+    print("Avarage Number of Customers in Queue: ", avarageNumberCustomersinQue,quecount/servedCustomerCount)
+    print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys,syscount/servedCustomerCount)
     print("Percentage of customers who cannot enter the ATM: %", percentageCustomersLeft)
 
 
