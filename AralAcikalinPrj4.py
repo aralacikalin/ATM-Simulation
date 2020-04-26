@@ -202,13 +202,13 @@ def simulation(lambd,mean,capacity):
 
     #table headers clock is current time, q is customers in queue,inSys is customers in system 
     #and right side of the future event list is the cumulative statistics
-    headers=["Clock","Q","isSrv","Sys","Future Event List","srvTime","cQ","cSys"]
+    headers=["Clock","Que","isServing","# of Cus. in Sys","Future Event List","C. Service Time","C.Que","C.Sys"]
     print(tabulate.tabulate(snapshot,headers=headers),"\n")
 
     print("Customers Served Number: ",servedCustomerCount)
-    print("Avarage Queue Time: " ,avarageQue)
-    print("Avarage Service Time: ", avarageServiceTime)
-    print("Avarage System Time: ", avarageSystemTime)
+    print("Avarage Queue Time: " ,avarageQue, " seconds")
+    print("Avarage Service Time: ", avarageServiceTime, " seconds")
+    print("Avarage System Time: ", avarageSystemTime, " seconds")
     print("Avarage Number of Customers in Queue: ", avarageNumberCustomersinQue)
     print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys)
     print("Percentage of customers who cannot enter the ATM: %", percentageCustomersLeft)
@@ -217,9 +217,9 @@ def simulation(lambd,mean,capacity):
 
 def main():
 
-    l=int(input("Enter λ: "))
-    m=int(input("Enter µ: "))
-    n=int(input("Enter Capacity(Enter 0 for infinite capacity): "))
+    l=int(input("Enter λ: ")) #lambda value
+    m=int(input("Enter µ: ")) #mean value
+    n=int(input("Enter Capacity(Enter 0 for infinite capacity): ")) #capacity value
 
     start=timer() #for outputing the run time of the code
     simulation(l,m,n)
