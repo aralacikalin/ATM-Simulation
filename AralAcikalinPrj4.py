@@ -6,6 +6,9 @@ from timeit import default_timer as timer
 #pip install tabulate
 import tabulate
 
+import progressbar as pb
+
+
 def randomExp(lambd):
     '''Creating a random inter-arival time in seconds'''  
     #creates a random inter-arrival variable 
@@ -14,6 +17,11 @@ def randomExp(lambd):
     return nextArrival
 
 def simulation(lambd,mean,capacity):
+    #initialize widgets
+    widgets = ['Time for loop of 1 000 000 iterations: ', pb.Percentage(), ' ', 
+                pb.Bar(marker=pb.RotatingMarker()), ' ', pb.ETA()]
+    #initialize timer
+    times = pb.ProgressBar(widgets=widgets, maxval=1000000).start()
     #initialize the simulation, statistics, cumulative statistics.
     snapshot=[]
     queTime=0
@@ -176,6 +184,8 @@ def simulation(lambd,mean,capacity):
             tempEvents=events.copy()
             snapshot.append([time,customersinQue,isServing,customersinSystem,tempEvents,serviceTime,cumulCustomersinQue,cumulCustomersinSystem])
 
+        times.update(servedCustomerCount)
+
 
     
 
@@ -213,7 +223,7 @@ def simulation(lambd,mean,capacity):
     print("Avarage Number of Customers in Sys: ", avarageNumberCustomersinSys)
     print("Percentage of customers who cannot enter the ATM: %", percentageCustomersLeft)
 
-
+    times.finish()
 
 def main():
 
